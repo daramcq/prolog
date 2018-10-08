@@ -3,13 +3,15 @@ link(c, b, 2).
 link(d, b, 3).
 link(e, b, 1).
 link(f, b, 1).
+link(g, b, 2).
+link(h, b, 1).
 
 connected(X, Y) :- link(X, Y, _).
 connected(X, Y) :- link(Y, X, _).
 connected(X, Y, W) :- link(X, Y, W).
 connected(X, Y, W) :- link(Y, X, W).
 
-reverse([],[]).
+reverse([], []).
 reverse([H|T], R) :-
     reverse(T, RTemp), append(RTemp, [H], R).
 
@@ -27,3 +29,21 @@ splitKey(X-_, X).
 heaviestConnectingNode(X, Y) :-
     weightedNodes(X, SP), SP = [HP|_],
     transpose(HP, H), splitKey(H, Y).
+
+negation(X, Y) :-
+    Y is -(0, X).
+
+pairNegation(X-Y, P):-
+    negation(X, KN),
+    P = KN-Y.
+
+negationWeightedNodes(X, SP) :-
+    linkedNodes(X, L),
+    maplist(pairNegation, L, NP),
+    keysort(NP, NSP),
+    maplist(pairNegation, NSP, SP).
+
+heaviestNodeViaNegation(X, Y) :-
+    negationWeightedNodes(X, SP),
+    SP = [HP|_], transpose(HP, H),
+    splitKey(H, Y).
