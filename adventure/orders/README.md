@@ -49,7 +49,16 @@ Stock = 120.
 
 ## Find the stock for a product via item name
 ```prolog
-?- item(ItemNum, book, _), stock(ItemNum, Stock).
-ItemNum = 1,
-Stock = 120.
+?- item_quantity('book', Qty).
+Qty = 120.
+true.
+```
+
+## Produce an inventory report
+```prolog
+?- inventory_report.
+book:  120
+record:  40
+table:  45
+true.
 ```
