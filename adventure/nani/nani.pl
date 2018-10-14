@@ -1,3 +1,9 @@
+:- dynamic here/1.
+:- dynamic have/1.
+:- dynamic location/2.
+
+here(kitchen).
+
 room(kitchen).
 room(office).
 room(hall).
@@ -23,8 +29,6 @@ edible(apple).
 edible(crackers).
 
 tastes_yucky(broccoli).
-
-here(kitchen).
 
 location_food(X, Y) :-
     location(X, Y), edible(X).
@@ -64,3 +68,40 @@ look_in(Thing) :-
     location(X, Thing),
     write(X), nl, fail.
 look_in(_).
+
+goto(Place) :-
+    can_go(Place),
+    move(Place),
+    look.
+
+can_go(Place) :-
+    here(X),
+    connected(X, Place).
+
+can_go(Place) :-
+    here(X),
+    write("You can't get to the "), write(Place),
+    write(' from the '), write(X), nl,
+    fail.
+
+move(Place) :-
+    retract(here(_)),
+    asserta(here(Place)).
+
+take(Thing) :-
+    can_take(Thing),
+    take_object(Thing).
+
+can_take(Thing) :-
+    here(Place),
+    location(Thing, Place).
+
+can_take(Thing) :-
+    write('There is no'), write(Thing),
+    write(' here.'),
+    nl, fail.
+
+take_object(Thing) :-
+    retract(location(Thing, _)),
+    asserta(have(Thing)),
+    write(Thing), write(' taken'), nl.
