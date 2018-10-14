@@ -62,3 +62,18 @@ record:  40
 table:  45
 true.
 ```
+
+## Print a message to say if an item needs restock
+```prolog
+?- item_needs_restock(book).
+book - Restock not needed
+```
+
+## Print a restock report on all items
+```prolog
+?- items_needing_restock.
+book - Restock not needed
+record - Restock not needed
+table - Restock Needed
+true.
+```

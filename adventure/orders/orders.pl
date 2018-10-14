@@ -2,7 +2,7 @@ customer(jim, dublin, aaa).
 customer(mary, chicago, bbb).
 customer(sandra, london, aaa).
 customer(jeffrey, birmingham, bbb).
-customer(maurice, london, bbb).
+customer(maurice, london, ccc).
 customer(samantha, 'new york', aaa).
 
 item(1, book, 80).
@@ -23,3 +23,35 @@ inventory_report :-
     nl,
     fail.
 inventory_report.
+
+good_customer(Customer) :-
+    customer(Customer, _, aaa);
+    customer(Customer, _, bbb).
+
+order_valid(Customer, ItemName, ReqQty) :-
+    good_customer(Customer),
+    item_quantity(ItemName, StockQty),
+    X is StockQty - ReqQty,
+    X > 0.
+
+restock_message(StockLevel, RestockPoint, Message) :-
+    StockLevel > RestockPoint,
+    Message = 'Restock not needed'.
+
+restock_message(StockLevel, RestockPoint, Message) :-
+    RestockPoint >= StockLevel,
+    Message = 'Restock Needed'.
+
+item_needs_restock(ItemName) :-
+    item(ItemNum, ItemName, RestockPoint),
+    stock(ItemNum, StockLevel),
+    restock_message(StockLevel, RestockPoint, Message),
+    write(ItemName), write(' - '), write(Message).
+
+
+items_needing_restock :-
+    item(_, ItemName, _),
+    item_needs_restock(ItemName),
+    nl,
+    fail.
+items_needing_restock.
