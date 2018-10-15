@@ -5,6 +5,9 @@ link(e, b, 1).
 link(f, b, 1).
 link(g, b, 2).
 link(h, b, 1).
+link(c, d, 1).
+link(a, f, 1).
+link(f, g, 1).
 
 connected(X, Y) :- link(X, Y, _).
 connected(X, Y) :- link(Y, X, _).
@@ -47,3 +50,23 @@ heaviestNodeViaNegation(X, Y) :-
     negationWeightedNodes(X, SP),
     SP = [HP|_], transpose(HP, H),
     splitKey(H, Y).
+
+path_available(X, Y, _) :- connected(X, Y).
+
+path_available(X, Y, Steps) :-
+    connected(X, Z),
+    not(member(Z, Steps)),
+    path_available(Z, Y, [X|Steps]).
+
+write_list([]).
+write_list([H|T]) :-
+    write(H), write(', '), write_list(T).
+
+define_path(X, Y) :-
+    path_available(X, Y, Steps),
+    write_list(Steps).
+
+weighted_path(X, Y, [Y-W]) :- connected(X, Y, W).
+weighted_path(X, Y, WeightedSteps) :-
+    connected(X, Z, W), not(member(Z-W, WeightedSteps)),
+    weighted_path(Z, Y, [X-W|WeightedSteps]).
