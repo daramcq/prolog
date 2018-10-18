@@ -69,7 +69,7 @@ define_path(X, Y) :-
 weighted_path(X, Y, _) :- connected(X, Y, _).
 weighted_path(X, Y, Steps) :-
     connected(X, Z, W),
-    not(member((X-Y)-W, Steps),
-    not(member((Y-X)-W, Steps),
+    not(member((X-Y)-W, Steps)),
+    not(member((Y-X)-W, Steps)),
     weighted_path(Z, Y, [(X-Y)-W|Steps]).
 
