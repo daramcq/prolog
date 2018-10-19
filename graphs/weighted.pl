@@ -71,5 +71,7 @@ weighted_path(X, Y, _) :-
 
 weighted_path(X, Y, Steps) :-
     connected(X, Z, W),
+    not(member((X-Z)-W, Steps)),
+    not(member((Z-X)-W, Steps)),
     weighted_path(Z, Y, [(X-Y)-W|Steps]).
 

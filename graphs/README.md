@@ -33,3 +33,10 @@ This implementation sorts and reverses a list of Pairs representing weighted edg
 ?- heaviestNodeViaNegation(b, X).
 X = d.
 ```
+
+### Find the Weighted Path between two nodes
+At present we can just query if a path is available. The next step is to return a weighted path. After that, we can identify the lowest or highest weighted path between two nodes.
+```prolog
+?- weighted_path(a, c, []).
+true .
+```
