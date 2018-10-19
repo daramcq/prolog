@@ -66,12 +66,13 @@ define_path(X, Y) :-
     path_available(X, Y, Steps),
     write_list(Steps).
 
-weighted_path(X, Y, _) :-
-    connected(X, Y, _).
+weighted_path(X, Y, Steps, FinalPath) :-
+    connected(X, Y, W),
+    FinalPath = [(X-Y-W)|Steps].
 
-weighted_path(X, Y, Steps) :-
+weighted_path(X, Y, Steps, FinalPath) :-
     connected(X, Z, W),
     not(member((X-Z)-W, Steps)),
     not(member((Z-X)-W, Steps)),
-    weighted_path(Z, Y, [(X-Y)-W|Steps]).
+    weighted_path(Z, Y, [(X-Y)-W|Steps], FinalPath).
 

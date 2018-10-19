@@ -34,9 +34,10 @@ This implementation sorts and reverses a list of Pairs representing weighted edg
 X = d.
 ```
 
-### Find the Weighted Path between two nodes
-At present we can just query if a path is available. The next step is to return a weighted path. After that, we can identify the lowest or highest weighted path between two nodes.
+### Weighted Path between two nodes
+Given two nodes connected via a path of nodes and weighted edges, we may wish to identify the weight of a given path between them.
 ```prolog
-?- weighted_path(a, c, []).
+?- weighted_path(a, c, [], Path).
+Path = [b-c-2, a-c-1].
 true .
 ```
