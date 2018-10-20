@@ -18,10 +18,6 @@ A weighted graph with rules to extract the connected node with greatest edge wei
 link(a, b, 1).
 link(c, b, 2).
 link(d, b, 3).
-link(e, b, 1).
-link(f, b, 1).
-link(g, b, 2).
-link(h, b, 1).
 ```
 We can propose a rule to return the node with the heaviest connecting edge.
 ```prolog

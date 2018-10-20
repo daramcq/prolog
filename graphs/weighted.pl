@@ -1,13 +1,8 @@
 link(a, b, 1).
 link(c, b, 2).
 link(d, b, 3).
-link(e, b, 1).
-link(f, b, 1).
-link(g, b, 2).
-link(h, b, 1).
-link(c, d, 1).
-link(a, f, 1).
-link(f, g, 1).
+link(d, c, 1).
+link(a, d, 1).
 
 connected(X, Y) :- link(X, Y, _).
 connected(X, Y) :- link(Y, X, _).
