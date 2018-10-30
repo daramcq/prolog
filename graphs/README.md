@@ -31,7 +31,7 @@ X = d.
 ```
 
 ### Weighted Path between two nodes
-Given two nodes connected via a path of nodes and weighted edges, we may wish to identify the weight of a given path between them.
+Given two nodes connected via a path of nodes and weighted edges, we may wish to identify the weight of the paths between them.
 ```prolog
 ?- weighted_path(a, c, [], [], L).
 L = [b-c-2, a-b-1] ;
@@ -42,7 +42,7 @@ L = [b-c-2, d-b-3, a-d-1] ;
 L = [b-c-2, c-b-2, d-c-1, a-d-1] ;
 false.
 ```
-We can then find the total weight:
+We can extend this to find the total weights of the paths between the nodes:
 ```prolog
 ?- weigh_path(a, c, Path, Weight).
 Path = [b-c-2, a-b-1],
