@@ -3,6 +3,7 @@ link(c, b, 2).
 link(d, b, 3).
 link(d, c, 1).
 link(a, d, 1).
+link(f, g, 1).
 
 connected(X, Y) :- link(X, Y, _).
 connected(X, Y) :- link(Y, X, _).
@@ -61,13 +62,14 @@ define_path(X, Y) :-
     path_available(X, Y, Steps),
     write_list(Steps).
 
-weighted_path(X, Y, Steps, FinalPath) :-
+weighted_path(X, Y, _, WeightedPath, FinalPath) :-
     connected(X, Y, W),
-    FinalPath = [(X-Y-W)|Steps].
+    FinalPath = [(X-Y)-W|WeightedPath].
 
-weighted_path(X, Y, Steps, FinalPath) :-
+weighted_path(X, Y, Trace, WeightedPath, FinalPath) :-
     connected(X, Z, W),
-    not(member((X-Z)-W, Steps)),
-    not(member((Z-X)-W, Steps)),
-    weighted_path(Z, Y, [(X-Y)-W|Steps], FinalPath).
+    not(member(Z, Trace)),
+    weighted_path(Z, Y, [X|Trace],
+                  [(X-Z)-W|WeightedPath],
+                  FinalPath).
 
