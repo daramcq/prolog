@@ -42,3 +42,20 @@ L = [b-c-2, d-b-3, a-d-1] ;
 L = [b-c-2, c-b-2, d-c-1, a-d-1] ;
 false.
 ```
+We can then find the total weight:
+```prolog
+?- weigh_path(a, c, Path, Weight).
+Path = [b-c-2, a-b-1],
+Weight = 3 ;
+Path = [d-c-1, c-d-1, b-c-2, a-b-1],
+Weight = 5 ;
+Path = [d-c-1, b-d-3, a-b-1],
+Weight = 5 ;
+Path = [d-c-1, a-d-1],
+Weight = 2 ;
+Path = [b-c-2, d-b-3, a-d-1],
+Weight = 6 ;
+Path = [b-c-2, c-b-2, d-c-1, a-d-1],
+Weight = 6 ;
+false.
+```
