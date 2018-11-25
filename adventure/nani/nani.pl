@@ -2,6 +2,7 @@
 :- dynamic have/1.
 :- dynamic location/2.
 :- dynamic off/1.
+:- dynamic door/3.
 
 here(kitchen).
 
@@ -23,15 +24,33 @@ door(hall, 'dining room', closed).
 door(kitchen, cellar, closed).
 door('dining room', kitchen, closed).
 
-open(door(RoomA, RoomB)) :-
-    retract(door(RoomA, RoomB, closed)),
-    asserta(door(RoomA, RoomB, open)),
+open_door(Room) :-
+    here(X),
+    connected(X, Room),
+    door(X, Room, closed),
+    retract(door(X, Room, closed)),
+    asserta(door(X, Room, open)),
     write('Door opened').
 
-closed(door(RoomA, RoomB)) :-
-    retract(door(RoomA, RoomB, open)),
-    asserta(door(RoomA, RoomB, closed)),
+open_door(Room) :-
+    here(X),
+    connected(X, Room),
+    door(X, Room, open),
+    write('The door is open already!'), fail.
+
+close_door(Room) :-
+    here(X),
+    connected(X, Room),
+    door(X, Room, open),
+    retract(door(X, Room, open)),
+    asserta(door(X, Room, closed)),
     write('Door closed').
+
+close_door(Room) :-
+    here(X),
+    connected(X, Room),
+    door(X, Room, closed),
+    write('The door is closed already!'), fail.
 
 location(desk, office).
 location(apple, kitchen).
@@ -112,7 +131,7 @@ can_go(Place) :-
     door(X, Place, closed),
     write("The door between the "), write(X),
     write(" and the "), write(Place),
-    write(" is closed!"),
+    write(" is closed!"), nl,
     fail.
 
 can_go(Place) :-
@@ -120,6 +139,11 @@ can_go(Place) :-
     write("You can't get to the "), write(Place),
     write(' from the '), write(X), nl,
     fail.
+
+can_go(Place) :-
+    here(Place),
+    write("Already in the "), write(Place), write('!'),
+    nl, fail.
 
 move(Place) :-
     retract(here(_)),
