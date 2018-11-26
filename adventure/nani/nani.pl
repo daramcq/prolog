@@ -3,6 +3,14 @@
 :- dynamic location/2.
 :- dynamic off/1.
 :- dynamic door/3.
+:- dynamic loc_list/2
+
+member(X, [X|_]).
+member(X, [_|T]) :- member(X, T).
+append([], X, X).
+
+append([H|T1], X, [H|T2]) :-
+    append(T1, X, T2).
 
 here(kitchen).
 
@@ -63,7 +71,35 @@ location(nani, 'washing machine').
 location(broccoli, kitchen).
 location(crackers, kitchen).
 location(computer, office).
+location(X, Y) :-
+    loc_list(List, Y),
+    member(X, List).
+
 off(flashlight).
+
+object(candle, red, small, 1).
+object(apple, red, small, 1).
+object(apple, green, small, 1).
+object(table, blue, big, 50).
+
+location_s(object(candle, red, small, 1), kitchen).
+location_s(object(apple, red, small, 1), kitchen).
+location_s(object(apple, green, small, 1), kitchen).
+location_s(object(table, blue, big, 50), kitchen).
+loc_list([apple, broccoli, crackers], kitchen).
+loc_list([desk, computer], office).
+loc_list([flashlight, envelope], desk).
+loc_list([stamp, key], envelope).
+loc_list(['washing machine'], cellar).
+loc_list([nani], 'washing machine').
+loc_list([], hall).
+
+add_thing(NewThing, Container, [NewThing|OldList]) :-
+    loc_list(OldList, Container).
+
+put_thing(Thing, Place) :-
+    retract(loc_list(List, Place)),
+    asserta(loc_list([NewThing|List], Place)).
 
 is_contained_in(T1, T2) :-
     location(T1, T2).
@@ -92,6 +128,22 @@ list_things(Place) :-
     nl,
     fail.
 list_things(_).
+
+write_weight(1) :-
+    write('1 pound').
+
+write_weight(W) :-
+    W > 1,
+    write(W), write(' pounds').
+
+list_things_s(Place) :-
+    location_s(object(Thing, Color, Size, Weight), Place),
+    write('A '), write(Size), tab(1),
+    write(Color), tab(1),
+    write(Thing), write(', weighing '),
+    write_weight(Weight), nl, fail.
+
+list_things_s(_).
 
 list_connected_rooms(Place) :-
     connected(Place, X),
@@ -161,6 +213,22 @@ can_take(Thing) :-
     write('There is no'), write(Thing),
     write(' here.'),
     nl, fail.
+
+can_take_s(Thing) :-
+    here(Room),
+    location_s(object(Thing, _, small, _), Room).
+
+can_take_s(Thing) :-
+    here(Room),
+    location_s(object(Thing, _, big, _), Room),
+    write('The '), write(Thing),
+    write(' is too big to carry.'), nl, fail.
+
+can_take_s(Thing) :-
+    here(Room),
+    not(location_s(object(Thing, _, _, _), Room)),
+    write('There is no '), write(Thing),
+    write(' here.'), nl, fail.
 
 take_object(Thing) :-
     retract(location(Thing, _)),
