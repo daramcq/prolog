@@ -1,9 +1,9 @@
 :- dynamic here/1.
 :- dynamic have/1.
-:- dynamic location/2.
+:- dynamic is_in/2.
 :- dynamic off/1.
 :- dynamic door/3.
-:- dynamic loc_list/2
+:- dynamic loc_list/2.
 
 member(X, [X|_]).
 member(X, [_|T]) :- member(X, T).
@@ -60,21 +60,20 @@ close_door(Room) :-
     door(X, Room, closed),
     write('The door is closed already!'), fail.
 
-location(desk, office).
-location(apple, kitchen).
-location(flashlight, desk).
-location(envelope, desk).
-location(stamp, envelope).
-location(key, envelope).
-location('washing machine', cellar).
-location(nani, 'washing machine').
-location(broccoli, kitchen).
-location(crackers, kitchen).
-location(computer, office).
-location(X, Y) :-
+is_in(desk, office).
+is_in(apple, kitchen).
+is_in(flashlight, desk).
+is_in(envelope, desk).
+is_in(stamp, envelope).
+is_in(key, envelope).
+is_in('washing machine', cellar).
+is_in(nani, 'washing machine').
+is_in(broccoli, kitchen).
+is_in(crackers, kitchen).
+is_in(computer, office).
+is_in(X, Y) :-
     loc_list(List, Y),
     member(X, List).
-
 off(flashlight).
 
 object(candle, red, small, 1).
@@ -99,30 +98,30 @@ add_thing(NewThing, Container, [NewThing|OldList]) :-
 
 put_thing(Thing, Place) :-
     retract(loc_list(List, Place)),
-    asserta(loc_list([NewThing|List], Place)).
+    asserta(loc_list([Thing|List], Place)).
 
 is_contained_in(T1, T2) :-
-    location(T1, T2).
+    is_in(T1, T2).
 
 is_contained_in(T1, T2) :-
-    location(T1, X), is_contained_in(X, T2).
+    is_in(T1, X), is_contained_in(X, T2).
 
 edible(apple).
 edible(crackers).
 
 tastes_yucky(broccoli).
 
-location_food(X, Y) :-
-    location(X, Y), edible(X).
+is_in_food(X, Y) :-
+    is_in(X, Y), edible(X).
 
-location_food(X, Y) :-
-    location(X, Y), tastes_yucky(X).
+is_in_food(X, Y) :-
+    is_in(X, Y), tastes_yucky(X).
 
 connected(X, Y) :- door(X, Y).
 connected(X, Y) :- door(Y, X).
 
 list_things(Place) :-
-    location(X, Place),
+    is_in(X, Place),
     tab(2),
     write(X),
     nl,
@@ -137,7 +136,7 @@ write_weight(W) :-
     write(W), write(' pounds').
 
 list_things_s(Place) :-
-    location_s(object(Thing, Color, Size, Weight), Place),
+    is_in_s(object(Thing, Color, Size, Weight), Place),
     write('A '), write(Size), tab(1),
     write(Color), tab(1),
     write(Thing), write(', weighing '),
@@ -163,7 +162,7 @@ look :-
     list_connected_rooms(Place).
 
 look_in(Thing) :-
-    location(X, Thing),
+    is_in(X, Thing),
     write(X), nl, fail.
 look_in(_).
 
@@ -216,29 +215,29 @@ can_take(Thing) :-
 
 can_take_s(Thing) :-
     here(Room),
-    location_s(object(Thing, _, small, _), Room).
+    is_in_s(object(Thing, _, small, _), Room).
 
 can_take_s(Thing) :-
     here(Room),
-    location_s(object(Thing, _, big, _), Room),
+    is_in_s(object(Thing, _, big, _), Room),
     write('The '), write(Thing),
     write(' is too big to carry.'), nl, fail.
 
 can_take_s(Thing) :-
     here(Room),
-    not(location_s(object(Thing, _, _, _), Room)),
+    not(is_in_s(object(Thing, _, _, _), Room)),
     write('There is no '), write(Thing),
     write(' here.'), nl, fail.
 
 take_object(Thing) :-
-    retract(location(Thing, _)),
+    retract(is_in(Thing, _)),
     asserta(have(Thing)),
     write(Thing), write(' taken'), nl.
 
 put(Thing) :-
     retract(have(Thing)),
     here(Place),
-    asserta(location(Thing, Place)).
+    asserta(is_in(Thing, Place)).
 
 inventory :-
     write('You have:'), nl,
