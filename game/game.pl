@@ -5,12 +5,12 @@ loop :-
     call(Action, Object).
     !.
 
-parse_object(List, Object) :-
-    List = [Object|_].
+car(List, Head) :-
+    List = [Head|_].
 
 parse_list(List, Action, Object) :-
     List = [Action|Tail],
-    parse_object(Tail, Object).
+    car(Tail, Object).
 
 parse_command(X, Action, Object) :-
     parse_list(X, Action, Object).
