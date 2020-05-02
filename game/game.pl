@@ -1,3 +1,21 @@
+
+
+state(State):-
+    State = [player-[location-x, inventory-[torch, snorkel]],
+             rooms-[room-[description-[this, is, a, place], items-[trowel]]]].
+
+player_info(State, PlayerInfo) :-
+    car(State, _-PlayerInfo).
+
+inventory(State, Inventory) :-
+    player_info(State, PlayerInfo),
+    cdr(PlayerInfo, InfoTail),
+    car(InfoTail, _-Inventory).
+
+get_inventory(Inventory) :-
+    state(S),
+    inventory(S, Inventory).
+
 loop :-
     repeat,
     prompt_input(InputList),
@@ -7,6 +25,9 @@ loop :-
 
 car(List, Head) :-
     List = [Head|_].
+
+cdr(List, Tail) :-
+    List = [_|Tail].
 
 parse_list(List, Action, Object) :-
     List = [Action|Tail],
