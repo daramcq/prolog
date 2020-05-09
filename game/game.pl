@@ -1,27 +1,67 @@
-state(State):-
-    State = [player-[location-x, inventory-[torch, snorkel]],
-             rooms-[room-[description-[this, is, a, place], items-[trowel]]]].
+
+starting_state(State) :-
+    State = state{
+                player_info: player_info{
+                                 location: myroom,
+                                 inventory: [torch, snorkel]
+                             },
+                rooms: rooms{
+                    myroom: myroom{
+                                description: "This is a beautiful room",
+                                items: [trowel]
+                            }
+                       }
+            }.
 
 player_info(State, PlayerInfo) :-
-    car(State, _-PlayerInfo).
+    PlayerInfo = State.get(player_info).
 
+current_room(State, Room) :-
+    PlayerLocation = State.get(player_info).get(location),
+    Room = State.get(rooms).get(PlayerLocation).
 
-write_list([]).
-write_list([LastElement]) :-
-    write(LastElement),
-    write('.').
+item_in_current_room(State, Item) :-
+    current_room(State, Room),
+    RoomItems = Room.get(items),
+    member(Item, RoomItems).
 
-write_list([H|T]) :-
-    write(H),
-    write(', '),
-    write_list(T).
+add_item_to_inventory(State, Item, NewState) :-
+    get_inventory(State, Inventory),
+    append(Inventory, [Item], NewInventory),
+    NewState = State.put(player_info/inventory, NewInventory).
+
+player_location(State, Location) :-
+    Location = State.get(player_info).get(location).                   
+
+take(Item, State, NewState) :-
+    item_in_current_room(State, Item),
+    add_item_to_inventory(State,
+                          Item,
+                          StateWithModifiedInventory),
+    remove_item_from_room(StateWithModifiedInventory,
+                          Item,
+                          NewState),
+    write('You took the '),
+    write(Item).
+
+take(Item, State, _) :-
+    item_in_current_room(State, Item);
+    write("That's not in the room").
+
+remove_item_from_room(State, Item, NewState) :-
+    player_info(State, PlayerInfo),
+    RoomName = PlayerInfo.location,
+    current_room(State, Room),
+    RoomItems = Room.get(items),
+    select(Item, RoomItems, NewRoomItems),
+    NewState = State.put(rooms/RoomName/items, NewRoomItems).
 
 get_inventory(State, Inventory) :-
     player_info(State, PlayerInfo),
-    cdr(PlayerInfo, InfoTail),
-    car(InfoTail, _-Inventory).
+    Inventory = PlayerInfo.inventory.
 
-inventory(State) :-
+inventory(State, NewState) :-
+    NewState = State,
     get_inventory(State, Inventory),
     write_inventory(Inventory).
 
@@ -34,45 +74,44 @@ write_inventory(Inventory):-
 
 get_location(State, Location) :-
     player_info(State, PlayerInfo),
-    car(PlayerInfo, _-Location).
+    Location = PlayerInfo.location.
 
 play :-
-    state(StartingState),
+    starting_state(StartingState),
     loop(StartingState).
 
 loop(State) :-
     repeat,
     prompt_input(InputList),
     Command =.. InputList,
-    call(Command, State),
-    loop(State).
+    call(Command, State, NewState),
+    loop(NewState).
 
 car(List, Head) :-
     List = [Head|_].
 
-cdr(List, Tail) :-
-    List = [_|Tail].
-
 parse_command(List, Action, Object) :-
     car(List, Action),
-    cdr(List, Object).
+    last(List, Object).
 
 move(X, State) :-
-    get_location(State, CurrentLocation),
-    write('You are in, '),
-    write(CurrentLocation),
-    write('.'),
-    nl,
     write('You are moving '),
     write(X).
 
-look(State) :-
-    get_location(State, CurrentLocation),
+look(State, NewState) :-
+    get_location(State, RoomName),
+    current_room(State, Room),
+    NewState = State,
+    RoomItems = Room.get(items),
+    Description = Room.get(description),
     write('You are in '),
-    write(CurrentLocation),
+    write(RoomName),
     write('.'),
     nl,
-    write('You are looking').
+    write(Description),
+    write('. '),
+    write('There is '),
+    write_list(RoomItems).
 
 prompt_input(UserInputAtoms) :-
     nl,
@@ -80,4 +119,13 @@ prompt_input(UserInputAtoms) :-
     read_line_to_string(user_input, UserInputString),
     string_lower(UserInputString, UserInputStringLower),
     atomic_list_concat(UserInputAtoms, ' ', UserInputStringLower).
-    
+
+write_list([]).
+write_list([LastElement]) :-
+    write(LastElement),
+    write('.').
+
+write_list([H|T]) :-
+    write(H),
+    write(', '),
+    write_list(T).
