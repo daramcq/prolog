@@ -1,3 +1,4 @@
+:- use_module(writing). 
 
 starting_state(State) :-
     State = state{
@@ -6,12 +7,40 @@ starting_state(State) :-
                                  inventory: [torch, snorkel]
                              },
                 rooms: rooms{
-                    myroom: myroom{
-                                description: "This is a beautiful room",
-                                items: [trowel]
-                            }
+                           myroom: myroom{
+                                       description: "This is a beautiful room",
+                                       items: [trowel, key],
+                                       objects: objects{
+                                                    locked_door: locked_door{
+                                                                     name: door,
+                                                                     description: "A locked door"
+                                                                 },
+                                                    table: table{
+                                                               name: table,
+                                                               description: "A beautiful wooden table"
+                                                           }
+                                                }
+                                   }
                        }
             }.
+
+remove_object(Object, Room, State, NewState) :-
+    write(Object),
+    del_dict(Object, State.rooms.Room.objects, _, MRNO),
+    NewState = State.put(rooms/Room/objects, MRNO).
+
+unlock_door(State, NewState) :-
+    remove_object(locked_door, State),
+    add_object(unlocked_door, State, NewState).
+
+interaction_effects(use, key, locked_door, [unlock_door]).
+
+do_interaction(Verb-Item-Object-ObjectState, State, NewState) :-
+    valid_interaction(Verb-Item-Object, State),
+    interaction_effects(Verb-Item-Object, Effects),
+    do_effects(Effects, State, NewState),
+    effect_results(Effects, Results),
+    write_results(Results).
 
 player_info(State, PlayerInfo) :-
     PlayerInfo = State.get(player_info).
@@ -119,13 +148,3 @@ prompt_input(UserInputAtoms) :-
     read_line_to_string(user_input, UserInputString),
     string_lower(UserInputString, UserInputStringLower),
     atomic_list_concat(UserInputAtoms, ' ', UserInputStringLower).
-
-write_list([]).
-write_list([LastElement]) :-
-    write(LastElement),
-    write('.').
-
-write_list([H|T]) :-
-    write(H),
-    write(', '),
-    write_list(T).
