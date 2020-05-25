@@ -21,13 +21,26 @@ starting_state(State) :-
                                                            }
                                                 }
                                    }
-                       }
+                       },
+                free_objects: free_objects{
+                                  unlocked_door: unlocked_door{
+                                                     name: door,
+                                                     description: "An unlocked door"
+                                                 }
+                              }
             }.
 
 remove_object(Object, Room, State, NewState) :-
     write(Object),
-    del_dict(Object, State.rooms.Room.objects, _, MRNO),
-    NewState = State.put(rooms/Room/objects, MRNO).
+    del_dict(Object, State.rooms.Room.objects, _, RoomNewObjects),
+    NewState = State.put(rooms/Room/objects, RoomNewObjects).
+
+replace_object(OldObject, NewObject, Room, State, NewState) :-
+    write(OldObject),
+    del_dict(OldObject, State.rooms.Room.objects, _, TempObjects),
+    NewObjects = TempObjects.put(State.free_objects.NewObject),
+                             write(NewObjects),
+    NewState = State.put(rooms/Room/objects, NewObjects).
 
 unlock_door(State, NewState) :-
     remove_object(locked_door, State),
